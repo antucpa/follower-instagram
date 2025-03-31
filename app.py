@@ -1,5 +1,6 @@
 from flask import Flask
 import requests
+import re
 import os
 
 app = Flask(__name__)
@@ -10,12 +11,18 @@ def get_followers():
     headers = {
         "User-Agent": "Mozilla/5.0"
     }
-    url = f"https://www.instagram.com/{username}/?__a=1&__d=dis"
+    url = f"https://www.instagram.com/{username}/"
+
     try:
         response = requests.get(url, headers=headers)
-        data = response.json()
-        count = data['graphql']['user']['edge_followed_by']['count']
-        return str(count)
+        html = response.text
+
+        # Cerca il numero follower usando una regex
+        match = re.search(r'"edge_followed_by":{"count":(\d+)}', html)
+        if match:
+            return match.group(1)
+        else:
+            return "-1"
     except:
         return "-1"
 
