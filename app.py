@@ -17,14 +17,11 @@ def get_followers():
         response = requests.get(url, headers=headers)
         html = response.text
 
-        # Cerca il numero follower usando una regex
-        match = re.search(r'"edge_followed_by":{"count":(\d+)}', html)
-        if match:
-            return match.group(1)
-        else:
-            return "-1"
-    except:
-        return "-1"
+        # DEBUG: mostra i primi 500 caratteri della pagina HTML
+        return html[:500]
+
+    except Exception as e:
+        return f"Errore: {str(e)}"
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
