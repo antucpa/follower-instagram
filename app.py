@@ -1,12 +1,11 @@
-from flask import Flask
+from flask import Flask, Response
 import requests
-import re
 import os
 
 app = Flask(__name__)
 
 @app.route('/')
-def get_followers():
+def debug_instagram_html():
     username = "the_drunk_deer"
     headers = {
         "User-Agent": "Mozilla/5.0"
@@ -16,22 +15,9 @@ def get_followers():
         url = f"https://www.instagram.com/{username}/"
         response = requests.get(url, headers=headers)
         html = response.text
-
-        # Cerca il numero dei follower nel <title> della pagina
-        match = re.search(r'"edge_followed_by":{"count":(\d+)}', html)
-        if match:
-            return match.group(1)
-        else:
-            # Metodo alternativo: cerca nel <title>
-            title_match = re.search(r'<title>([\d,\.]+)\sFollowers', html)
-            if title_match:
-                followers = title_match.group(1).replace(",", "").replace(".", "")
-                return followers
-            else:
-                return "-1"
-
+        return Response(html, mimetype='text/plain')
     except Exception as e:
-        return "-1"
+        return f"Errore: {str(e)}"
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
