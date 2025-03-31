@@ -11,17 +11,27 @@ def get_followers():
     headers = {
         "User-Agent": "Mozilla/5.0"
     }
-    url = f"https://www.instagram.com/{username}/"
 
     try:
+        url = f"https://www.instagram.com/{username}/"
         response = requests.get(url, headers=headers)
         html = response.text
 
-        # DEBUG: mostra i primi 500 caratteri della pagina HTML
-        return html[:500]
+        # Cerca il numero dei follower nel <title> della pagina
+        match = re.search(r'"edge_followed_by":{"count":(\d+)}', html)
+        if match:
+            return match.group(1)
+        else:
+            # Metodo alternativo: cerca nel <title>
+            title_match = re.search(r'<title>([\d,\.]+)\sFollowers', html)
+            if title_match:
+                followers = title_match.group(1).replace(",", "").replace(".", "")
+                return followers
+            else:
+                return "-1"
 
     except Exception as e:
-        return f"Errore: {str(e)}"
+        return "-1"
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
